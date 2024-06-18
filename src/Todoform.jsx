@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react'
 import Todolist from './Todolist';
 
 const Todoform = () => {
-    const [messages, setMessages] = useState(+localStorage.getItem('messages') || []);
+    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
    useEffect(()=>{
-    localStorage.setItem('messages', []);
-   }, [messages])
+    const storedMessage = localStorage.getItem('messages');
+    if(storedMessage){
+      setMessages(JSON.parse(storedMessage));
+    }
+   }, [])
 
   const handleMessageChange = (e) => {
     setNewMessage(e.target.value);
@@ -15,7 +18,11 @@ const Todoform = () => {
 
   const handleAddMessage = () => {
     if(newMessage.trim() !== ''){
-      setMessages([...messages, newMessage.trim()]);
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages, newMessage.trim()];
+        localStorage.setItem('messages', JSON.stringify(updatedMessages));
+        return updatedMessages;
+      });
       setNewMessage('');
     } 
   };
@@ -38,7 +45,7 @@ const Todoform = () => {
             onClick={ handleAddMessage }>Add New
           </button>
 
-          <Todolist messages={ messages }/>
+          <Todolist messages={ messages } setMessages= { setMessages }/>
     </>
   )
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Todolist = ({ messages }) => {
+const Todolist = ({ messages, setMessages }) => {
   const [isChecked, setIsChecked] = useState(Array(messages.length).fill(false));
 
   const handleCheckBox = (index) => {
@@ -11,16 +11,30 @@ const Todolist = ({ messages }) => {
     });
   };
 
+  const deleteTask = (index) => {
+    const updatedTask = messages.filter((_, i) => i !== index);
+    setMessages(updatedTask);
+    localStorage.setItem('messages', JSON.stringify(updatedTask));
+  };
+
+  const toggleTaskCompletion = (index) => {
+    const updatedTask = messages.map((message, i) => 
+      i === index ? {...message, completed: !message.completed } : message
+    );
+    setMessages(updatedTask);
+    localStorage.setItem('messages', JSON.stringify(updatedTask));
+    console.log(updatedTask);
+  };
+
   return (
     <>
       {messages.map((message, index) => (
         <div className="form-check mt-3" key={index}>
           <input
-            onClick={() => handleCheckBox(index)}
-            checked={isChecked[index]}
+            onChange={() => toggleTaskCompletion(index)}
+            checked={message.completed}
             className="form-check-input"
             type="checkbox"
-            value=""
             id={`addNewTask${index}`}
           />
           <label
@@ -30,7 +44,10 @@ const Todolist = ({ messages }) => {
              >
             {message}
           </label>
-          <button type='button' className='btn btn-danger float-end'>Delete</button>
+          <button 
+            type='button' 
+            className='btn btn-danger float-end'
+            onClick={() => deleteTask(index)}>Delete</button>
         </div>
       ))}
     </>
