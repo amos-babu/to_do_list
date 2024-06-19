@@ -1,29 +1,23 @@
 import React, { useState } from 'react';
 
 const Todolist = ({ messages, setMessages }) => {
-  const [isChecked, setIsChecked] = useState(Array(messages.length).fill(false));
+  // State to track the completion status of each task
+  const [completedTasks, setCompletedTasks] = useState(Array(messages.length).fill(false));
 
-  const handleCheckBox = (index) => {
-    setIsChecked((prevChecked) => {
-      const updatedChecked = [...prevChecked];
-      updatedChecked[index] = !updatedChecked[index];
-      return updatedChecked;
-    });
+  const toggleTaskCompletion = (index) => {
+    const updatedCompletedTasks = completedTasks.map((completed, i) =>
+      i === index ? !completed : completed
+    );
+    setCompletedTasks(updatedCompletedTasks);
   };
 
   const deleteTask = (index) => {
-    const updatedTask = messages.filter((_, i) => i !== index);
-    setMessages(updatedTask);
-    localStorage.setItem('messages', JSON.stringify(updatedTask));
-  };
+    const updatedMessages = messages.filter((_, i) => i !== index);
+    setMessages(updatedMessages);
+    localStorage.setItem('messages', JSON.stringify(updatedMessages));
 
-  const toggleTaskCompletion = (index) => {
-    const updatedTask = messages.map((message, i) => 
-      i === index ? {...message, completed: !message.completed } : message
-    );
-    setMessages(updatedTask);
-    localStorage.setItem('messages', JSON.stringify(updatedTask));
-    console.log(updatedTask);
+    const updatedCompletedTasks = completedTasks.filter((_, i) => i !== index);
+    setCompletedTasks(updatedCompletedTasks);
   };
 
   return (
@@ -32,22 +26,25 @@ const Todolist = ({ messages, setMessages }) => {
         <div className="form-check mt-3" key={index}>
           <input
             onChange={() => toggleTaskCompletion(index)}
-            checked={message.completed}
+            checked={completedTasks[index]}
             className="form-check-input"
             type="checkbox"
             id={`addNewTask${index}`}
           />
           <label
-            style={{ textDecoration: isChecked[index] ? 'line-through' : 'none' }}
+            style={{ textDecoration: completedTasks[index] ? 'line-through' : 'none' }}
             className="form-check-label"
             htmlFor={`addNewTask${index}`}
-             >
+          >
             {message}
           </label>
-          <button 
-            type='button' 
-            className='btn btn-danger float-end'
-            onClick={() => deleteTask(index)}>Delete</button>
+          <button
+            type="button"
+            className="btn btn-danger float-end"
+            onClick={() => deleteTask(index)}
+          >
+            Delete
+          </button>
         </div>
       ))}
     </>
